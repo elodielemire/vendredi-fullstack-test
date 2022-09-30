@@ -2,6 +2,13 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Exercice
+
+Create a real time chat where the user can :
+- Read the last 10 messages of the chat when he enters
+- Read the new messages of the other users 
+- Write and send new messages to the other users
+
 ## How to run the project
 
 In the project directory, you can run:
