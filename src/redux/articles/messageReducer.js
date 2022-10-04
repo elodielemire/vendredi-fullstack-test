@@ -4,14 +4,15 @@ const INITIAL_STATE = [];
 
 export default function messageReducer (state= INITIAL_STATE, action) {
     switch (action.type) {
-        case "ADDMESSAGE":
+        case "SEND_MESSAGE":
+        case "RECEIVE_MESSAGE":
             const newMessage = action.payload;
             // To avoid adding sent messages again
             if (state.find(message => message.id === newMessage.id)) return state;
 
             return [...state, newMessage];
 
-        case "DELETEMESSAGE":
+        case "DELETE_MESSAGE":
             return state.filter(message => message.id !== action.payload);
         default:
             return state;
@@ -25,24 +26,18 @@ export const sendMessage = text => (dispatch, getState) => {
         id: uuidv4(),
         senderId: state.currentUserId
     }
-    dispatch(addMessage(message));
-
-    const options = {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(message)
-    }
-
-    // TODO handle error case
-    fetch('http://localhost:3001/message', options);
+    return dispatch({
+        type: 'SEND_MESSAGE',
+        payload: message
+    });
 }
 
-export const addMessage = message => ({
-    type: 'ADDMESSAGE',
+export const receiveMessage = message => ({
+    type: 'RECEIVE_MESSAGE',
     payload: message
 });
 
 export const deleteMessage = id => ({
-    type: 'DELETEMESSAGE',
+    type: 'DELETE_MESSAGE',
     payload: id
 });
