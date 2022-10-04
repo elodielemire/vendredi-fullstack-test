@@ -5,7 +5,10 @@ import deleteLogo from '../../assets/delete.svg';
 
 export default function Message ({message}) {
     const currentUserId = useSelector(state => state.currentUserId);
-    const isSentByMe = message.senderId === currentUserId;
+    const senderId = message.senderId;
+    const numberOfColors = 0xFFFFFF;
+    const userColor = Math.floor(senderId/100*numberOfColors).toString(16);
+    const isSentByMe = senderId === currentUserId;
 
     const dispatch = useDispatch();
     const deleteCard = id => {
@@ -15,7 +18,7 @@ export default function Message ({message}) {
     return (
         <div className={ "message-container " + (isSentByMe? "message--current-user" : "")}>
             <div className="message">
-                {!isSentByMe && <p className='message__author'>Written by user #{message.senderId}</p>}
+                {!isSentByMe && <p className='message__author' style={{color: `#${userColor}`}}>Written by user #{message.senderId}</p>}
                 <p className='message__text'>{message.text}</p>
 
                 {isSentByMe &&
