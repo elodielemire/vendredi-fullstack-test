@@ -10,6 +10,11 @@ export const middleware = store => next => {
         store.dispatch(receiveMessage(message));
     };
 
+    events.onerror = () => {
+        console.error('Error on server side')
+        events.close()
+    }
+
     return action => {
         if (action.type === 'SEND_MESSAGE') {
             const message = action.payload;
