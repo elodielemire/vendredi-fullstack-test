@@ -31,3 +31,6 @@ And start sending messages on the chat :)
 ## Improvements
 - Add a view to enter the name of the user instead of generating a random Id
 - Test it
+
+## Explanatory diagram
+![IMG_20221005_222440](https://user-images.githubusercontent.com/11667695/194157242-3acd1f3f-f60f-4374-8582-0049fc7cf314.jpg)
