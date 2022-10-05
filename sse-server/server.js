@@ -1,10 +1,11 @@
+const assert = require('assert');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
 const app = express();
 const PORT = 3001;
-let clients = [];
+const clients = [];
 let lastTenMessages = [];
 
 app.use(cors());
@@ -32,22 +33,20 @@ function eventsHandler(request, response, next) {
     })
 
     const clientId = Date.now();
-    const newClient = {
-        id: clientId,
-        response
-    };
-    clients.push(newClient);
+    clients.push(response);
 
     request.on('close', () => {
         console.log(`${clientId} Connection closed`);
-        clients = clients.filter(client => client.id !== clientId);
+        const index = clients.indexOf(response);
+        assert(index !== -1, 'client could not be dropped'); // throw an exception if the first param is false
+        clients.splice(index, 1); // delete matching client
     });
 }
 
 app.get('/events', eventsHandler);
 
 function sendEventsToAll(newMessage) {
-    clients.forEach(client => client.response.write(`data: ${JSON.stringify(newMessage)}\n\n`))
+    clients.forEach(client => client.write(`data: ${JSON.stringify(newMessage)}\n\n`))
 }
 
 async function addMessage(request, response) {

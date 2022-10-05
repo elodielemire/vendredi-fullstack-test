@@ -12,7 +12,6 @@ export const middleware = store => next => {
 
     events.onerror = () => {
         console.error('Error on server side')
-        events.close()
     }
 
     return action => {
