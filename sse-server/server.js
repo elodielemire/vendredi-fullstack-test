@@ -5,6 +5,7 @@ const cors = require('cors');
 
 const app = express();
 const PORT = 3001;
+/** @type {express.Response[]} */
 const clients = [];
 let lastTenMessages = [];
 
@@ -27,10 +28,7 @@ function eventsHandler(request, response, next) {
         'Cache-Control': 'no-cache'
     };
     response.writeHead(200, headers);
-    lastTenMessages.forEach((item) => {
-        const data = `data: ${JSON.stringify(item)}\n\n`;
-        response.write(data);
-    })
+    lastTenMessages.forEach(item => sendEvent(item, response))
 
     const clientId = Date.now();
     clients.push(response);
@@ -46,10 +44,17 @@ function eventsHandler(request, response, next) {
 app.get('/events', eventsHandler);
 
 function sendEventsToAll(newMessage) {
-    clients.forEach(client => client.write(`data: ${JSON.stringify(newMessage)}\n\n`))
+    clients.forEach(client => sendEvent(newMessage, client))
 }
 
-async function addMessage(request, response) {
+function sendEvent(item, response, event) {
+    if (event) {
+        response.write(`event: ${event}\n`);
+    }
+    response.write(`data: ${JSON.stringify(item)}\n\n`);
+}
+
+function addMessage(request, response) {
     const newMessage = request.body;
     lastTenMessages = [...lastTenMessages.slice(-9), newMessage];
     response.status(204).end();
@@ -57,3 +62,16 @@ async function addMessage(request, response) {
 }
 
 app.post('/message', addMessage);
+
+/**
+ * @param {express.Request} request
+ * @param {express.Response} response
+ */
+function deleteMessage(request, response) {
+    const {messageId} = request.params;
+    lastTenMessages = lastTenMessages.filter(message => message.id !== messageId);
+    clients.forEach(client => sendEvent(messageId, client, "delete"));
+    response.status(204).end();
+}
+
+app.delete('/:messageId', deleteMessage);

@@ -13,6 +13,7 @@ export default function messageReducer (state= INITIAL_STATE, action) {
             return [...state, newMessage];
 
         case "DELETE_MESSAGE":
+        case "RECEIVE_DELETION_REQUEST":
             return state.filter(message => message.id !== action.payload);
         default:
             return state;
@@ -39,5 +40,10 @@ export const receiveMessage = message => ({
 
 export const deleteMessage = id => ({
     type: 'DELETE_MESSAGE',
+    payload: id
+});
+
+export const receiveDeletionRequest = id => ({
+    type: 'RECEIVE_DELETION_REQUEST',
     payload: id
 });

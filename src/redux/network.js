@@ -1,4 +1,4 @@
-import {receiveMessage} from "./articles/messageReducer";
+import {receiveMessage, receiveDeletionRequest} from "./articles/messageReducer";
 
 const BASE_URL = 'http://localhost:3001';
 
@@ -9,6 +9,11 @@ export const middleware = store => next => {
         const message = JSON.parse(event.data);
         store.dispatch(receiveMessage(message));
     };
+
+    events.addEventListener('delete', (event) => {
+        const messageId = JSON.parse(event.data);
+        store.dispatch(receiveDeletionRequest(messageId));
+    });
 
     events.onerror = () => {
         console.error('Error on server side')
@@ -26,6 +31,15 @@ export const middleware = store => next => {
             // Let it flow in the middleware pipeline, we don’t want to intercept it, just POST the message.
             next(action);
             // Let the caller deal with error handling
+            return result;
+        } else if (action.type === 'DELETE_MESSAGE') {
+            const messageId = action.payload;
+            const options = {
+                method: 'DELETE',
+                headers: {'Content-Type': 'application/json'},
+            }
+            const result = fetch(`${BASE_URL}/${messageId}`, options);
+            next(action);
             return result;
         }
 
